@@ -2,7 +2,7 @@
   "name": "gestor-treino-desktop",
   "version": "1.0.0",
   "description": "Sistema de Treinos Funcionais",
-  "main": "main.js",
+  "main": "./src/main.js",
   "scripts": {
     "start": "electron .",
     "pack": "electron-builder --dir",
@@ -15,7 +15,7 @@
       "output": "dist"
     },
     "win": {
-    "icon": "assets/icon.png",
+    "icon": "./public/icons/icon.png",
       "target": [
         "nsis"
       ]
@@ -27,7 +27,7 @@
     }
   },
   "keywords": [],
-  "author": "Seu Nome",
+  "author": "Josneito Tutoriais",
   "license": "ISC",
   "devDependencies": {
     "electron": "^40.1.0",

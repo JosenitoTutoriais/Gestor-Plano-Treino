@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plano de Treino - Gestor</title>
+    <script src="./assets/js/cdn.tailwindcss.com.js"></script>
+    <script src="./assets/js/jspdf.umd.min.js"></script>
+    <script src="./assets/js/jspdf.plugin.autotable.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="./assets/css/style.css">
+    <!-- <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script> -->
+</head>
+<style>
+
+</style>
+
+<body>
+
+    <div id="toast" class="toast">Salvo com sucesso!</div>
+
+    <nav class="bg-slate-800 text-white p-4 sticky top-0 z-40 shadow-lg">
+        <div class="max-w-6xl mx-auto flex justify-between items-center">
+            <h1 class="font-bold text-lg md:text-xl">Gestor de Plano de Treino</h1>
+            <div class="flex gap-3">
+                <button onclick="showList()"
+                    class="px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded transition">Meus Treinos</button>
+                <button onclick="createNew()"
+                    class="px-4 py-2 bg-blue-600 hover:bg-blue-500 rounded font-bold transition">+ Novo</button>
+            </div>
+        </div>
+    </nav>
+
+    <div id="view-list" class="max-w-6xl mx-auto p-4 mt-6">
+        <div class="flex flex-col md:flex-row justify-between items-center mb-6 border-b pb-2 gap-4">
+            <h2 class="text-2xl font-bold text-slate-700">Planos Salvos</h2>
+            <div class="flex gap-2">
+                <button onclick="exportPlans()"
+                    class="text-sm bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded flex items-center gap-2 transition">
+                    📤 Exportar Backup
+                </button>
+                <label
+                    class="text-sm bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded cursor-pointer flex items-center gap-2 transition">
+                    📥 Importar JSON
+                    <input type="file" id="importFile" class="hidden" accept=".json" onchange="importPlans(event)">
+                </label>
+            </div>
+        </div>
+        <div id="plans-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+    </div>
+
+    <div id="view-form" class="hidden pb-20">
+        <div class="a4-paper">
+            <div class="text-center border-b-2 border-black pb-4 mb-6">
+                <h1 class="text-2xl font-bold uppercase">Plano de Treino Funcional</h1>
+            </div>
+            <form id="training-form">
+                <input type="hidden" id="plan-id">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div><label class="font-bold text-sm">PROFESSOR(A):</label><input type="text" id="professor"
+                            class="w-full border-b border-gray-400 focus:border-blue-500 outline-none bg-transparent">
+                    </div>
+                    <div><label class="font-bold text-sm">DATA:</label><input type="date" id="data"
+                            class="w-full border-b border-gray-400 focus:border-blue-500 outline-none bg-transparent">
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 gap-4 mb-4">
+                    <div class="flex gap-2 items-end"><label
+                            class="font-bold text-sm whitespace-nowrap">MODALIDADE:</label><input type="text"
+                            value="Treinamento Funcional" disabled
+                            class="w-full border-b border-gray-300 bg-gray-50 text-gray-500"></div>
+                    <div class="flex gap-2 items-end"><label class="font-bold text-sm whitespace-nowrap">TEMA DA
+                            AULA:</label><input type="text" id="tema"
+                            class="w-full border-b border-gray-400 outline-none" placeholder="Ex: Circuito Metabólico">
+                    </div>
+                    <div class="flex gap-2 items-end"><label class="font-bold text-sm whitespace-nowrap">PARTE DO CORPO
+                            / FOCO:</label><input type="text" id="parte_corpo"
+                            class="w-full border-b border-gray-400 outline-none"></div>
+                </div>
+
+                <div class="form-section-title">Informações do Grupo</div>
+                <div class="bg-slate-50 p-4 border rounded mb-4">
+                    <div class="mb-3">
+                        <label class="font-bold text-sm block mb-1">Público-alvo:</label>
+                        <div class="flex gap-4 flex-wrap">
+                            <label><input type="radio" name="publico" value="Iniciantes"> Iniciantes</label>
+                            <label><input type="radio" name="publico" value="Intermediário"> Intermediário</label>
+                            <label><input type="radio" name="publico" value="Avançado"> Avançado</label>
+                        </div>
+                    </div>
+                    <div class="flex gap-4">
+                        <div class="flex-1"><label class="font-bold text-sm">Faixa etária:</label><input type="text"
+                                id="faixa_etaria" class="w-full border-b border-gray-400 outline-none bg-transparent">
+                        </div>
+                        <div class="flex-1"><label class="font-bold text-sm">Qtd. Alunos:</label><input type="number"
+                                id="qtd_alunos" class="w-full border-b border-gray-400 outline-none bg-transparent">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label class="font-bold text-sm block mb-2">Materiais utilizados:</label>
+                    <div class="check-grid" id="materiais-container">
+                        <label class="check-item"><input type="checkbox" value="Colchonete"> Colchonete</label>
+                        <label class="check-item"><input type="checkbox" value="Cones"> Cones</label>
+                        <label class="check-item"><input type="checkbox" value="Elástico"> Elástico</label>
+                        <label class="check-item"><input type="checkbox" value="Bambolê"> Bambolê</label>
+                        <label class="check-item"><input type="checkbox" value="Escadinha"> Escadinha</label>
+                        <label class="check-item"><input type="checkbox" value="Bastão"> Bastão</label>
+                        <label class="check-item"><input type="checkbox" value="Halteres"> Halteres</label>
+                        <label class="check-item"><input type="checkbox" value="Kettlebell"> Kettlebell</label>
+                    </div>
+                    <input type="text" id="materiais_outros" placeholder="Outros..."
+                        class="w-full border-b border-gray-300 mt-2 text-sm">
+                </div>
+
+                <div class="form-section-title">Objetivos</div>
+                <div class="mb-4">
+                    <div class="check-grid mb-4" id="objetivos-container">
+                        <label class="check-item"><input type="checkbox" value="Condicionamento físico geral">
+                            Condicionamento físico</label>
+                        <label class="check-item"><input type="checkbox" value="Fortalecimento muscular"> Fortalecimento
+                            muscular</label>
+                        <label class="check-item"><input type="checkbox" value="Mobilidade e flexibilidade">
+                            Mobilidade/Flexibilidade</label>
+                        <label class="check-item"><input type="checkbox" value="Coordenação motora"> Coordenação
+                            motora</label>
+                        <label class="check-item"><input type="checkbox" value="Equilíbrio e estabilidade">
+                            Equilíbrio/Estabilidade</label>
+                        <label class="check-item"><input type="checkbox" value="Resistência cardiovascular"> Resistência
+                            cardio</label>
+                    </div>
+                    <div><label class="font-bold text-sm">OBJETIVO ESPECÍFICO DA AULA:</label><input type="text"
+                            id="objetivo_especifico" class="w-full border p-2 rounded mt-1 bg-yellow-50"></div>
+                </div>
+
+                <div class="form-section-title">1. Aquecimento</div>
+                <table class="input-table" id="tb-aquecimento">
+                    <thead>
+                        <tr>
+                            <th style="width: 40%">Exercício</th>
+                            <th style="width: 25%">Tempo/Repetição</th>
+                            <th style="width: 30%">Observações</th>
+                            <th style="width: 5%"></th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+                <button type="button" onclick="addRow('tb-aquecimento')" class="btn-action btn-add">+ Adicionar
+                    Linha</button>
+
+                <div class="form-section-title">2. Parte Principal – Treino Funcional</div>
+                <table class="input-table" id="tb-principal">
+                    <thead>
+                        <tr>
+                            <th style="width: 35%">Exercícios/Movimentos</th>
+                            <th style="width: 20%">Repetição/Tempo</th>
+                            <th style="width: 15%">Séries</th>
+                            <th style="width: 25%">Intervalo/Obs</th>
+                            <th style="width: 5%"></th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+                <button type="button" onclick="addRow('tb-principal')" class="btn-action btn-add">+ Adicionar
+                    Linha</button>
+
+                <div class="flex gap-6 my-6 p-4 border bg-gray-50 rounded">
+                    <div><label class="font-bold text-sm block mb-1">INTENSIDADE:</label><select id="intensidade"
+                            class="border p-1 rounded bg-white">
+                            <option value="Leve">🟢 Leve</option>
+                            <option value="Moderada">🟡 Moderada</option>
+                            <option value="Alta">🔴 Alta</option>
+                        </select></div>
+                    <div class="flex-1"><label class="font-bold text-sm block mb-1">CONTROLE:</label><input type="text"
+                            id="controle" value="Percepção de esforço + hidratação entre séries."
+                            class="w-full border-b border-gray-400 bg-transparent text-sm"></div>
+                </div>
+
+                <div class="form-section-title">Volta à Calma / Alongamento</div>
+                <table class="input-table" id="tb-calma">
+                    <thead>
+                        <tr>
+                            <th style="width: 40%">Exercício</th>
+                            <th style="width: 25%">Tempo</th>
+                            <th style="width: 30%">Observações</th>
+                            <th style="width: 5%"></th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+                <button type="button" onclick="addRow('tb-calma')" class="btn-action btn-add">+ Adicionar Linha</button>
+
+                <div class="flex gap-4 mt-8 pt-6 border-t border-gray-300">
+                    <button type="submit"
+                        class="flex-1 py-3 bg-green-600 hover:bg-green-700 text-white font-bold rounded shadow transition">💾
+                        Salvar Alterações</button>
+                    <button type="button" onclick="showList()"
+                        class="px-6 py-3 bg-gray-500 hover:bg-gray-600 text-white font-bold rounded transition">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="view-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-lg shadow-2xl p-6">
+            <div class="flex justify-between items-center border-b pb-4 mb-4">
+                <h2 class="text-2xl font-bold text-slate-800" id="modal-title">Detalhes do Treino</h2>
+                <button onclick="closeModal()"
+                    class="text-gray-500 hover:text-red-500 text-2xl font-bold">&times;</button>
+            </div>
+            <div id="modal-content" class="space-y-6"></div>
+            <div class="mt-8 flex justify-end gap-3 border-t pt-4">
+                <button onclick="closeModal()"
+                    class="px-6 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded font-bold transition">Fechar</button>
+                <button id="btn-edit-modal"
+                    class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded font-bold transition">Editar
+                    Plano</button>
+            </div>
+        </div>
+    </div>
+    <footer class="bg-slate-800 text-slate-400 py-6 mt-auto border-t border-slate-700 text-center text-sm">
+        <div class="max-w-6xl mx-auto px-4">
+            <p class="mb-2">
+                &#169; G.P.T - Gestor de Plano de Treino. Todos os direitos reservados - 2026.
+            </p>
+            <p class="font-bold text-slate-200">
+                JT - Desenvolvimento Apps
+            </p>
+        </div>
+    </footer>
+    <script src="./assets/js/app.js"></script>
+</body>
+
+</html>

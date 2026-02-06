@@ -20,7 +20,7 @@ function createWindow() {
     });
 
     // Carrega o seu arquivo HTML
-    win.loadFile('src/index.html');
+    win.loadFile('./public/index.html');
 
     // Remove a barra de menu padrão (opcional, para parecer mais "app")
     // win.setMenuBarVisibility(false);

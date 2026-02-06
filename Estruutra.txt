@@ -1,0 +1,72 @@
+📘 Manual do Desenvolvedor - Projeto Electron
+Este documento detalha a estrutura de arquivos, os comandos de instalação e o processo de geração do executável (build) para o sistema.
+
+1. Estrutura de Diretórios
+A organização do projeto deve seguir estritamente a árvore abaixo para garantir o funcionamento do electron-builder:
+
+Plaintext
+meu-projeto/
+│
+├── package.json        # Configurações do projeto e scripts de automação
+├── main.js             # Processo Principal (Back-end: Cria a janela)
+├── preload.js          # Ponte de Segurança (Comunicação segura entre Main e Renderer)
+│
+└── src/
+    ├── index.html      # A Interface do usuário (HTML)
+    ├── renderer.js     # Lógica da Interface (Front-end: botões, cálculos, DOM)
+    │
+    └── assets/         # Arquivos estáticos (Imagens, Ícones, CSS)
+        ├── icon.png    # Ícone para visualização durante o dev (Linux/Mac)
+        └── icon.ico    # Ícone OBRIGATÓRIO para o instalador do Windows
+2. Instalação das Dependências
+Antes de iniciar, certifique-se de ter o Node.js instalado.
+
+A. Instalação Automática (Recomendado)
+Se o arquivo package.json já estiver configurado com as dependências, execute apenas:
+
+Bash
+npm install
+Este comando lê o arquivo package.json e baixa automaticamente o Electron e o Builder.
+
+B. Instalação Manual (Do Zero)
+Caso esteja iniciando o projeto sem um package.json preenchido, execute os comandos abaixo na ordem:
+
+Instalar o Electron (O motor do aplicativo):
+
+Bash
+npm install electron --save-dev
+Instalar o Electron Builder (Gerador de executáveis .exe):
+
+Bash
+npm install electron-builder --save-dev
+3. Desenvolvimento e Execução
+Para testar o aplicativo em tempo real enquanto programa:
+
+Bash
+npm start
+Isso abrirá a janela do aplicativo utilizando o código atual.
+
+4. Gerar Executável (Build)
+Para criar o instalador final (.exe) para distribuição:
+
+Bash
+npm run dist
+✅ Checklist Anti-Erro para o Build:
+Para que o comando acima funcione sem falhas, verifique:
+
+Ícones: O arquivo icon.ico precisa existir dentro da pasta src/assets/ (ou onde foi apontado na configuração).
+
+Configuração no package.json: Certifique-se de que a seção build aponta para os diretórios corretos.
+
+Caminhos: No seu HTML, verifique se os scripts estão sendo chamados corretamente:
+
+<script src="./renderer.js"></script>
+
+5. Glossário de Arquivos
+main.js: É o cérebro do aplicativo. Ele controla o ciclo de vida da janela (abrir, fechar, minimizar) e interage com o Sistema Operacional.
+
+preload.js: Atua como um "segurança". Ele expõe apenas funções específicas do sistema para o site, impedindo que o site tenha acesso total desprotegido ao computador do usuário.
+
+renderer.js: É onde fica o JavaScript "normal" do seu site (interações de clique, manipulação de tabelas, salvar dados no LocalStorage, etc).
+
+package.json: O arquivo de identidade do projeto. Contém o nome, versão, dependências e configurações de build.

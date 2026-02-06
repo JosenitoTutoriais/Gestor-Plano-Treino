@@ -1,0 +1,36 @@
+{
+  "name": "gestor-treino-desktop",
+  "version": "1.0.0",
+  "description": "Sistema de Treinos Funcionais",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder"
+  },
+  "build": {
+    "appId": "com.car.calculo",
+    "productName": "G.P.T - Gestor de Plano de Treino",
+    "directories": {
+      "output": "dist"
+    },
+    "win": {
+    "icon": "assets/icon.png",
+      "target": [
+        "nsis"
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "shortcutName": "Gestor de Treino"
+    }
+  },
+  "keywords": [],
+  "author": "Seu Nome",
+  "license": "ISC",
+  "devDependencies": {
+    "electron": "^40.1.0",
+    "electron-builder": "^26.7.0"
+  }
+}
